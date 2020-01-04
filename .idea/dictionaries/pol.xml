@@ -2,7 +2,13 @@
   <dictionary name="pol">
     <words>
       <w>cand</w>
+      <w>cuda</w>
+      <w>dest</w>
       <w>keypoints</w>
+      <w>shfl</w>
+      <w>syncthreads</w>
+      <w>trtc</w>
+      <w>vect</w>
     </words>
   </dictionary>
 </component>

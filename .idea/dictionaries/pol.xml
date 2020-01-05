@@ -4,7 +4,9 @@
       <w>cand</w>
       <w>cuda</w>
       <w>dest</w>
+      <w>keypoint</w>
       <w>keypoints</w>
+      <w>scalespace</w>
       <w>shfl</w>
       <w>syncthreads</w>
       <w>trtc</w>

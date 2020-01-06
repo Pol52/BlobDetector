@@ -20,7 +20,7 @@ image = img_as_float(grayscaleImage)
 
 maxSigma = 100
 minSigma = 0.1
-sigmaRatio = 1.4
+sigmaRatio = 1.6
 k = int(log(float(maxSigma) / minSigma, sigmaRatio)) + 1
 sigmaList = np.array([minSigma + (sigmaRatio ** i) for i in range(k + 1)])
 print("===============IMAGE LOADED===============")

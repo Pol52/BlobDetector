@@ -6,8 +6,8 @@ import numpy.linalg as linalg
 
 def filterCandidates(candidates, dogOctave):
     keypoints = []
-    r_th = 10
-    t_c = 0.03
+    r_th = 30
+    t_c = 0.05
     R_th = (r_th+1)**2 / r_th
 
     for candidate in candidates:
@@ -51,9 +51,10 @@ def filterCandidates(candidates, dogOctave):
 def displayKeypoints(keypoints):
     resultImage = cv2.imread('/WD/PycharmProjects/BlobDetector/blobDetectionSequential/images/1.png', cv2.COLOR_RGB2BGR)
     for keypoint in keypoints:#keypoint sono x,y,candidates sono y,x
-        scalespace = int(np.ceil(keypoint[2]))
-        if scalespace >= 0:
-            radius = math.sqrt(2)*scalespace*1.6
-            resultImage = cv2.circle(resultImage, (int(keypoint[0]), int(keypoint[1])), int(radius), (0, 255, 0), 2)
+        if keypoint[0] > 0 and keypoint[1] > 0:
+            scalespace = int(np.ceil(keypoint[2]))
+            if scalespace >= 0:
+                radius = math.sqrt(2)*scalespace*1.6
+                resultImage = cv2.circle(resultImage, (int(keypoint[0]), int(keypoint[1])), int(radius), (0, 255, 0), 2)
     cv2.imshow('Result', resultImage)
     cv2.waitKey(0)

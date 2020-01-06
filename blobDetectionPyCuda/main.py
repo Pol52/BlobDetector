@@ -84,25 +84,25 @@ __global__ void findMax(float *xOut, float *yOut, float *zOut, float *in, int im
     }
 }
 
-__inline__ __device__ float warpReduceMin(float val){   
-    float tmpVal = __shfl_down(val, 3, 27);
+__inline__ __device__ float warpReduceMin(float val){
+    /*float tmpVal = __shfl_down(val, 3, 27);
     if (tmpVal < val){
         val = tmpVal;
-    }
-    for (int offset = 12; offset > 0; offset/=2){
-        float tmpVal = __shfl_down(val, offset, offset*2 );
-        if (tmpVal < val){
+    }*/
+    for (int offset = warpSize; offset > 0; offset/=2){
+        float tmpVal = __shfl_down(val, offset);
+        if (tmpVal < val && tmpVal != 0){
             val = tmpVal;
         }
     }
     return val;
 }
 
-__global__ void findMin(float *xOut, float *yOut, float *zOut, float *in, int imageWidth, int imageHeight, int zIndex) { 
+__global__ void findMin(float* xOut, float* yOut, float* zOut, float *in, int imageWidth, int imageHeight, int zIndex) {
     float minVal = 999;
     int tx = threadIdx.x;
     int ty = threadIdx.y;
-    int tz = threadIdx.z;    
+    int tz = threadIdx.z;
     int pixelIndex =  tz*imageWidth * imageHeight + imageWidth * (blockIdx.y + ty) + blockIdx.x + tx ;
 
     int pixelAmount = 3 * imageWidth * imageHeight;
@@ -111,18 +111,18 @@ __global__ void findMin(float *xOut, float *yOut, float *zOut, float *in, int im
         __syncthreads();
         minVal = warpReduceMin(minVal);
         __syncthreads();
-        if(threadIdx.x == 0 && threadIdx.y == 0 && threadIdx.z == 0){   
+        if(threadIdx.x == 0 && threadIdx.y == 0 && threadIdx.z == 0){
             float expectedMin = in[pixelIndex + imageWidth*imageHeight + imageWidth + 1];
             float overflow1 = in[pixelIndex + imageWidth*imageHeight + imageWidth];
             float overflow2 = in[pixelIndex + imageWidth*imageHeight + imageWidth + 2];
             float overflow3 = in[pixelIndex + imageWidth*imageHeight - imageWidth + 1];
             float overflow4 = in[pixelIndex + imageWidth*imageHeight + 2*imageWidth + 1];
-            if(expectedMin == minVal && overflow1 > minVal && overflow2 > minVal && overflow3 > minVal && overflow4 > minVal ){
+            if(expectedMin == minVal ){
                 xOut[pixelIndex + imageWidth + 1] = blockIdx.x + 1  ;
                 yOut[pixelIndex + imageWidth + 1] = blockIdx.y + 1 ;
                 zOut[pixelIndex + imageWidth + 1] = zIndex;
             }
-        }        
+        }
     }
 }
 """)
@@ -157,7 +157,6 @@ for zIndex in range(1, newDogOctave.shape[0]-1):
     yOutTmp = np.zeros((264306,)).astype(np.float32)
     zOutTmp = np.zeros((264306,)).astype(np.float32)
     findMin(cuda.Out(xOutTmp), cuda.Out(yOutTmp), cuda.Out(zOutTmp), cuda.In(inputArray), np.int32(newDogOctave.shape[2]), np.int32(newDogOctave.shape[1]), np.int32(zIndex), block=blockSize, grid=gridSize)
-    zOutTmp.fill(zIndex)
     xOutMin[zIndex, :] = xOutTmp
     yOutMin[zIndex, :] = yOutTmp
     zOutMin[zIndex, :] = zOutTmp

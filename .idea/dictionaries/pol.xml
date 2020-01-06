@@ -6,6 +6,7 @@
       <w>dest</w>
       <w>keypoint</w>
       <w>keypoints</w>
+      <w>linalg</w>
       <w>scalespace</w>
       <w>shfl</w>
       <w>syncthreads</w>

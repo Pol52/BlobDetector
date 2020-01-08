@@ -22,7 +22,7 @@ __global__ void findMax(float *xOut, float *yOut, float *zOut, float *in, int im
     int ty = threadIdx.y;
     int tz = threadIdx.z;    
     int pixelIndex =  (blockIdx.z + tz) * imageWidth * imageHeight + imageWidth * (blockIdx.y + ty) + blockIdx.x + tx ;
-    int pixelAmount = (blockDim.z + 2) * imageWidth * imageHeight;
+    int pixelAmount = (gridDim.z + 2) * imageWidth * imageHeight;
     if(pixelIndex < pixelAmount){
         maxVal = max(maxVal, in[pixelIndex]);
         __syncthreads();
@@ -59,8 +59,9 @@ __global__ void findMin(float* xOut, float* yOut, float* zOut, float *in, int im
     int ty = threadIdx.y;
     int tz = threadIdx.z;
     int pixelIndex = (blockIdx.z + tz) * imageWidth * imageHeight + imageWidth * (blockIdx.y + ty) + blockIdx.x + tx ;
-
-    int pixelAmount = (blockDim.z + 2) * imageWidth * imageHeight;
+    
+    int pixelAmount = (gridDim.z + 2) * imageWidth * imageHeight;
+    
     if(pixelIndex < pixelAmount){
         minVal = min(minVal, in[pixelIndex]);
         __syncthreads();
@@ -80,14 +81,12 @@ __global__ void findMin(float* xOut, float* yOut, float* zOut, float *in, int im
 
 
 def computeKeypoints(dogOctave):
-
     newDogOctave = dogOctave.transpose(2, 0, 1)
     xOutMax, yOutMax, zOutMax = findMaxPoints(newDogOctave)
     xOutMin, yOutMin, zOutMin = findMinPoints(newDogOctave)
     candidates = []
     compressCoordinates(xOutMax, yOutMax, zOutMax, candidates)
     compressCoordinates(xOutMin, yOutMin, zOutMin, candidates)
-
     return candidates
 
 

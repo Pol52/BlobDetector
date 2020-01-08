@@ -41,7 +41,7 @@ def computeForK(z):
     for i in range(1, dogOctave.shape[0]-1):
         for j in range(1, dogOctave.shape[1]-1):
             miniDog = dogOctave[i-1:i+2, j-1:j+2, z-1:z+2]
-            if np.argmax(miniDog) == 13 or np.argmin(miniDog) == 13:
+            if  np.argmin(miniDog) == 13 or np.argmax(miniDog) == 13:
                 candidatesList.append([j, i, z])
     return np.array(candidatesList)
 
@@ -58,6 +58,8 @@ for candidatesList in candidatesLists:
     for candidate in candidatesList:
         candidates.append(candidate)
 
+for candidate in candidates:
+    print(str(candidate[0]) + " " + str(candidate[1]) + " " + str(candidate[2]))
 print("==========FOUND " + str(len(candidates)) + " CANDIDATES===========")
 print("===========FILTERING CANDIDATES===========")
 
